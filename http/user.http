@@ -1,0 +1,27 @@
+### 회원가입
+POST http://localhost:8080/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "email":"{{email}}",
+  "password":"{{password}}",
+  "name":"{{name}}",
+  "nickname":"{{nickname}}"
+}
+
+### 로그인
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("Authorization", response.headers.valueOf("Authorization"));
+    client.log("Authorization: " + response.headers.valueOf("Authorization"));
+
+    client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
+    client.log("RefreshToken: " + response.headers.valueOf("RefreshToken"));
+%}
