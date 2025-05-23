@@ -7,7 +7,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,7 +17,7 @@ import java.util.Base64;
 import java.util.Date;
 
 @Component
-@Slf4j(topic = "JwtUtil")
+@Slf4j(topic = "TokenProvider")
 public class TokenProvider {
 
     // accessToken 토큰 헤더
@@ -112,25 +111,19 @@ public class TokenProvider {
 
     // refreshToken 만료기한 점검
     public boolean refreshTokenPeriodCheck(String token) {
-        Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token.substring(BEARER_PREFIX.length()));
         long now = (new Date()).getTime();
         long refresh_expiredTime = claimsJws.getBody().getExpiration().getTime();
         long refresh_nowTime = new Date(now + REFRESH_TOKEN_EXPIRE_TIME).getTime();
 
-        // RefreshToken 의 만료기간이 3일 이상일 경우
-        if (refresh_nowTime - refresh_expiredTime > THREE_DAYS) {
-            return true;
-        }
-        return false;
+        // RefreshToken 의 만료기간이 3일 이상일 경우 true
+        return refresh_nowTime - refresh_expiredTime > THREE_DAYS;
     }
 
     // 토큰에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token){
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-    }
-
-    // 헤더에 AccessToken 담기
-    public void setHeaderAccessToken(HttpServletResponse response, String accessToken){
-        response.setHeader(AUTH_ACCESS_HEADER, accessToken);
+        return Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody();
     }
 }

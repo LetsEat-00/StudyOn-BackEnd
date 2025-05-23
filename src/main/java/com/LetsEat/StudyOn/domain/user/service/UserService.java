@@ -10,6 +10,7 @@ import com.LetsEat.StudyOn.domain.user.entity.User;
 import com.LetsEat.StudyOn.domain.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +20,12 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final TokenProvider jwtUtil;
+    private final TokenProvider tokenProvider;
 
     /**
      * 회원가입
@@ -47,28 +49,30 @@ public class UserService {
     @Transactional
     public TokenResponseDto reissue(TokenRequestDto tokenRequestDto) {
         // Refresh Token 검증
-        if (!jwtUtil.refreshTokenPeriodCheck(tokenRequestDto.getRefreshToken())) {
+        if (tokenProvider.refreshTokenPeriodCheck(tokenRequestDto.getRefreshToken())) {
             throw new CustomException(ErrorType.INVALID_REFRESH_TOKEN);
         }
 
         // AccessToken 에서 사용자 정보 가져오기(email)
-        Claims info = jwtUtil.getUserInfoFromToken(tokenRequestDto.getAccessToken());
+        Claims info = tokenProvider.getUserInfoFromToken(tokenRequestDto.getAccessToken()
+                .substring(TokenProvider.BEARER_PREFIX.length()));
 
         // email 에 해당하는 User 의 refreshToken 을 가져옴
-        User user = userRepository.findByEmail(String.valueOf(info))
+        User user = userRepository.findByEmail(info.getSubject())
                 .orElseThrow(() -> new CustomException(ErrorType.NOT_FOUND_USER));
 
         // refreshToken 이 일치하는지 검사
-        if (!user.getRefreshToken().equals(tokenRequestDto.getRefreshToken())) {
+        if (!user.getRefreshToken().equals(tokenRequestDto.getRefreshToken()
+                .substring(TokenProvider.BEARER_PREFIX.length()))) {
             throw new CustomException(ErrorType.INVALID_USER_INFO);
         }
 
         // 새로운 토큰 생성
         TokenResponseDto tokenResponseDto = null;
-        if (!jwtUtil.refreshTokenPeriodCheck(user.getRefreshToken())) {
+        if (tokenProvider.refreshTokenPeriodCheck(tokenRequestDto.getRefreshToken())) {
             // Refresh Token의 유효기간이 3일 미만일 경우 전체(Access / Refresh) 재발급
-            String newAccessToken = jwtUtil.createAccessToken(user.getEmail(), user.getUserRole());
-            String newRefreshToken = jwtUtil.createRefreshToken(user.getEmail(), user.getUserRole());
+            String newAccessToken = tokenProvider.createAccessToken(user.getEmail(), user.getUserRole());
+            String newRefreshToken = tokenProvider.createRefreshToken(user.getEmail(), user.getUserRole());
 
             tokenResponseDto = new TokenResponseDto(newAccessToken, newRefreshToken);
 
@@ -77,7 +81,7 @@ public class UserService {
             userRepository.save(user);
         } else {
             // RefreshToken 의 유효기간이 3일 이상일 경우 AccessToken 만 재발급
-            String newAccessToken = jwtUtil.createAccessToken(user.getEmail(), user.getUserRole());
+            String newAccessToken = tokenProvider.createAccessToken(user.getEmail(), user.getUserRole());
             long now = (new Date()).getTime();
             Date accessTokenExpiresIn = new Date(now + TokenProvider.ACCESS_TOKEN_EXPIRE_TIME);
             tokenResponseDto = new TokenResponseDto(newAccessToken, accessTokenExpiresIn.getTime());

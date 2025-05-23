@@ -10,7 +10,6 @@ import com.LetsEat.StudyOn.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import static com.LetsEat.StudyOn.common.util.ControllerUtil.getResponseEntity;
@@ -46,5 +45,4 @@ public class UserController {
         TokenResponseDto tokenResponseDto = userService.reissue(tokenRequestDto);
         return getResponseEntity(tokenResponseDto, "AccessToken & RefreshToken 재발급");
     }
-
 }

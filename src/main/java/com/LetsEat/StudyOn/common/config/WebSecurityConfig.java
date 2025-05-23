@@ -53,9 +53,7 @@ public class WebSecurityConfig {
     // 인증 필터
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(tokenProvider, userRepository);
-        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        return filter;
+        return new JwtAuthenticationFilter(tokenProvider, userRepository, authenticationManager(authenticationConfiguration));
     }
 
     // 인가 필터
@@ -95,7 +93,8 @@ public class WebSecurityConfig {
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
             .requestMatchers(HttpMethod.POST, "api/v1/auth/signup").permitAll()
             .requestMatchers(HttpMethod.POST, "api/v1/auth/reissue").permitAll()
-            .requestMatchers(HttpMethod.GET, "api/v1/test").permitAll()
+//            .requestMatchers(HttpMethod.GET, "api/v1/test").permitAll()
+                .requestMatchers(HttpMethod.POST, "api/v1/auth/login").permitAll()
             .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
@@ -110,8 +109,8 @@ public class WebSecurityConfig {
         );
 
         // 필터 순서 설정 : 인가 필터 > 인증 필터 > Username ~ 필터
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
 
         //예외 검증
         http.exceptionHandling(exceptionHandling ->
