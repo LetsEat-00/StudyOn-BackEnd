@@ -37,6 +37,19 @@ public final class ControllerUtil {
     }
 
     /**
+     * 상태코드, 메시지 입력 ResponseEntity
+     *
+     * @param msg 응답 메시지
+     * @return ResponseEntity
+     */
+    public static ResponseEntity<CommonResponse<?>> getResponseEntity(HttpStatus status, String msg) {
+        return ResponseEntity.status(status).body(CommonResponse.builder()
+                .statusCode(status.value())
+                .msg(msg)
+                .build());
+    }
+
+    /**
      * PathVariable의 Id와 RequestBody의 Id와 일치하는지 확인
      *
      * @param pathId PathVariable의 Id
