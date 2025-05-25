@@ -34,9 +34,9 @@ public class WebSecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
     private final JwtLogoutHandler jwtLogoutHandler;
+
 
     // 패스워드 암호화
     @Bean
@@ -60,6 +60,12 @@ public class WebSecurityConfig {
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter(tokenProvider, userDetailsService);
+    }
+
+    // 인가 필터
+    @Bean
+    public JwtExceptionHandlerFilter jwtExceptionHandlerFilter() {
+        return new JwtExceptionHandlerFilter();
     }
 
     // CORS 정책 설정
@@ -111,14 +117,13 @@ public class WebSecurityConfig {
         // 필터 순서 설정 : 인가 필터 > 인증 필터 > Username ~ 필터
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+        http.addFilterBefore(jwtExceptionHandlerFilter(), JwtAuthorizationFilter.class);
 
         //예외 검증
         http.exceptionHandling(exceptionHandling ->
                 exceptionHandling
-                        // AuthenticationEntryPoint 등록
+                        // AuthenticationEntryPoint 등록 (로그아웃 예외처리)
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                        // AccessDeniedHandler 등록
-                        .accessDeniedHandler(jwtAccessDeniedHandler)
         );
 
         return http.build();

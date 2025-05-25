@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 커스텀 예외처리 핸들러
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<?> handleScheduleException(CustomException e) {
         e.printStackTrace();
@@ -20,6 +21,7 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionDto(e.getErrorType()));
     }
 
+    // validation 예외처리 핸들러
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleException(MethodArgumentNotValidException e){
         e.printStackTrace();
@@ -32,5 +34,4 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDto(builder.toString()));
     }
-
 }

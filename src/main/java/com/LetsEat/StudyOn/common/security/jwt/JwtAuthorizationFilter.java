@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,18 +29,32 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
 
+    private final AntPathRequestMatcher loginRequestMatcher =
+            new AntPathRequestMatcher("/api/v1/auth/login", "POST");
+    private final AntPathRequestMatcher reissueRequestMatcher =
+            new AntPathRequestMatcher("/api/v1/auth/reissue", "POST");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        // 요청이 로그인인 경우 인증 필터로 넘김
+        if (loginRequestMatcher.matches(request) || reissueRequestMatcher.matches(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // header 에서 accessToken 가져오기
         String accessToken = tokenProvider.getAccessTokenFromHeader(request);
 
         // accessToken 이 null 값인지 체크
         if(StringUtils.hasText(accessToken)){
             // accessToken 검증
-            if(tokenProvider.validateToken(request, accessToken)){
+            if(tokenProvider.validateToken(accessToken)){
                 // accessToken 이 유효할 때
                 authenticateWithAccessToken(accessToken);
             }
+        }else {
+            throw new CustomException(ErrorType.NOT_FOUND_TOKEN);
         }
 
         filterChain.doFilter(request, response);

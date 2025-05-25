@@ -26,9 +26,18 @@ Content-Type: application/json
     client.log("RefreshToken: " + response.headers.valueOf("RefreshToken"));
 %}
 
+### 로그아웃
+POST http://localhost:8080/api/v1/auth/logout
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+> {%
+    client.global.clear("Authorization");
+    client.global.clear("RefreshToken");
+%}
+
 ### RefreshToken 재발급
 POST http://localhost:8080/api/v1/auth/reissue
-Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
@@ -36,3 +45,7 @@ Content-Type: application/json
   "refreshToken": "{{RefreshToken}}"
 }
 
+### test
+GET http://localhost:8080/api/v1/test
+Authorization: {{Authorization}}
+Content-Type: application/json

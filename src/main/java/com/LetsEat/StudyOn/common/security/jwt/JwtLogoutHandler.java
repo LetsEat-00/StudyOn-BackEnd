@@ -36,8 +36,8 @@ public class JwtLogoutHandler implements LogoutHandler {
         }
 
         // 유저를 찾고, 유저의 refreshToken을 null로 set
-        String accountId = jwtUtil.getUserInfoFromToken(refreshTokenValue).getSubject();
-        User findUser = userRepository.findByEmail(accountId)
+        String email = jwtUtil.getUserInfoFromToken(accessTokenValue).getSubject();
+        User findUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorType.NOT_FOUND_USER));
         findUser.setRefreshToken(null);
         userRepository.save(findUser);

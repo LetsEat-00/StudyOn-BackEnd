@@ -14,6 +14,7 @@ public enum ErrorType {
     DUPLICATED_EMAIL(BAD_REQUEST, "이미 존재하는 사용자 이메일입니다."),
     INVALID_EMAIL(HttpStatus.UNAUTHORIZED, "잘못된 이메일입니다."),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    FAILED_TO_BE_LOGIN(HttpStatus.FORBIDDEN, "로그인이 실패하였습니다."),
     DEACTIVATE_USER(HttpStatus.FORBIDDEN, "이미 탈퇴한 회원입니다."),
     NO_AUTHENTICATION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),

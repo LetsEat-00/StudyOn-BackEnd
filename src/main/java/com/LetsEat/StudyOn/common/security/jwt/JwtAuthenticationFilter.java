@@ -1,9 +1,11 @@
 package com.LetsEat.StudyOn.common.security.jwt;
 
+import com.LetsEat.StudyOn.common.dto.CommonResponse;
 import com.LetsEat.StudyOn.common.enums.UserRole;
+import com.LetsEat.StudyOn.common.exception.CustomException;
+import com.LetsEat.StudyOn.common.exception.ErrorType;
 import com.LetsEat.StudyOn.common.security.UserDetailsImpl;
 import com.LetsEat.StudyOn.common.security.dto.LoginRequestDto;
-import com.LetsEat.StudyOn.common.util.ControllerUtil;
 import com.LetsEat.StudyOn.domain.user.entity.User;
 import com.LetsEat.StudyOn.domain.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +24,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 @RequiredArgsConstructor
@@ -78,18 +79,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 응답
             log.info("로그인 성공");
+            response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_OK);
             new ObjectMapper().writeValue(response.getWriter(),
-                    Map.of("msg", "로그인 성공", "status", HttpStatus.OK.value()));
+                    CommonResponse.builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .msg("로그인 성공")
+                    .build());
 
-        } catch (AuthenticationException ex) {
+        } catch (AuthenticationException e) {
             // 로그인 실패
             log.info("로그인 실패");
-            response.setContentType("application/json");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            new ObjectMapper().writeValue(response.getWriter(),
-                    Map.of("msg", "로그인 실패", "status", HttpStatus.UNAUTHORIZED.value()));
+            throw new CustomException(ErrorType.FAILED_TO_BE_LOGIN);
         }
 
         filterChain.doFilter(request, response);

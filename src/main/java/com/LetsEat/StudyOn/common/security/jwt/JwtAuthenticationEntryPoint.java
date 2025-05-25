@@ -1,27 +1,27 @@
 package com.LetsEat.StudyOn.common.security.jwt;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Slf4j
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    // 인가 실패
-    // 인증되지 않은 사용자가 인증이 필요한 페이지에 접근 했을 경우 실행
-    @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
+    private final HandlerExceptionResolver resolver;
 
-        response.setCharacterEncoding("utf-8");
-        response.sendError(401, "잘못된 접근입니다.");
+    public JwtAuthenticationEntryPoint(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+        this.resolver = resolver;
+    }
+
+    // 인증 관련된 예외를 처리를 GlobalExceptionHandler 에게 위임하여 처리한다. (지금은 로그아웃에 대한 예외만 처리중)
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) {
+        resolver.resolveException(request, response, null, (Exception) request.getAttribute("exception"));
     }
 }

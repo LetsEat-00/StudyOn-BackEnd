@@ -20,20 +20,13 @@ import java.util.Date;
 @Slf4j(topic = "TokenProvider")
 public class TokenProvider {
 
-    // accessToken 토큰 헤더
-    public static final String AUTH_ACCESS_HEADER = "Authorization";
-    // refreshToken 토큰 헤더
-    public static final String AUTH_REFRESH_HEADER = "RefreshToken";
-    // 사용자 권한 키
-    public static final String AUTHORIZATION_KEY = "auth";
-    // Token 식별자
-    public static final String BEARER_PREFIX = "Bearer ";
-    // accessToken 만료 시간 (60분)
-    public static final long ACCESS_TOKEN_EXPIRE_TIME = 60 * 60 * 1000L;
-    // refreshToken 만료 시간 (2주)
-    private final long REFRESH_TOKEN_EXPIRE_TIME = 14 * 24 * 60 * 60 * 1000L;
-    // 3일
-    private static final long THREE_DAYS = 1000 * 60 * 60 * 24 * 3;
+    public static final String AUTH_ACCESS_HEADER = "Authorization"; // accessToken 토큰 헤더
+    public static final String AUTH_REFRESH_HEADER = "RefreshToken"; // refreshToken 토큰 헤더
+    public static final String AUTHORIZATION_KEY = "auth"; // 사용자 권한 키
+    public static final String BEARER_PREFIX = "Bearer "; // Token 식별자
+    public static final long ACCESS_TOKEN_EXPIRE_TIME = 60 * 60 * 1000L; // accessToken 만료 시간 (60분)
+    private final long REFRESH_TOKEN_EXPIRE_TIME = 14 * 24 * 60 * 60 * 1000L; // refreshToken 만료 시간 (2주)
+    private static final long THREE_DAYS = 1000 * 60 * 60 * 24 * 3; // 3일
 
 
     @Value("${jwt.secret.key}")
@@ -82,15 +75,15 @@ public class TokenProvider {
 
     // header 에서 RefreshToken 가져오기
     public String getRefreshTokenFromHeader(HttpServletRequest request){
-        String accessToken = request.getHeader(AUTH_REFRESH_HEADER);
-        if(StringUtils.hasText(accessToken) && accessToken.startsWith(BEARER_PREFIX)) {
-            return accessToken.substring(BEARER_PREFIX.length());
+        String refreshToken = request.getHeader(AUTH_REFRESH_HEADER);
+        if(StringUtils.hasText(refreshToken) && refreshToken.startsWith(BEARER_PREFIX)) {
+            return refreshToken.substring(BEARER_PREFIX.length());
         }
         return null;
     }
 
     // accessToken 검증
-    public boolean validateToken(HttpServletRequest request, String token) {
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
@@ -102,7 +95,7 @@ public class TokenProvider {
             throw new CustomException(ErrorType.EXPIRED_JWT);
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-            throw new CustomException(ErrorType.EXPIRED_JWT);
+            throw new CustomException(ErrorType.UNSUPPORTED_JWT);
         } catch (IllegalArgumentException e) {
             log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
             throw new CustomException(ErrorType.INVALID_JWT);
@@ -111,19 +104,27 @@ public class TokenProvider {
 
     // refreshToken 만료기한 점검
     public boolean refreshTokenPeriodCheck(String token) {
-        Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token.substring(BEARER_PREFIX.length()));
-        long now = (new Date()).getTime();
-        long refresh_expiredTime = claimsJws.getBody().getExpiration().getTime();
-        long refresh_nowTime = new Date(now + REFRESH_TOKEN_EXPIRE_TIME).getTime();
+        try {
+            Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key).build()
+                    .parseClaimsJws(token.substring(BEARER_PREFIX.length()));
+            long now = (new Date()).getTime();
+            long refresh_expiredTime = claimsJws.getBody().getExpiration().getTime();
+            long refresh_nowTime = new Date(now + REFRESH_TOKEN_EXPIRE_TIME).getTime();
 
-        // RefreshToken 의 만료기간이 3일 이상일 경우 true
-        return refresh_nowTime - refresh_expiredTime > THREE_DAYS;
+            // RefreshToken 의 만료기간이 3일 이상일 경우 true
+            return refresh_nowTime - refresh_expiredTime > THREE_DAYS;
+        }catch (Exception e) {
+            throw new CustomException(ErrorType.INVALID_JWT);
+        }
     }
 
     // 토큰에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token){
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody();
+        try {
+            return Jwts.parserBuilder().setSigningKey(key).build()
+                    .parseClaimsJws(token).getBody();
+        }catch (Exception e) {
+            throw new CustomException(ErrorType.INVALID_JWT);
+        }
     }
 }
