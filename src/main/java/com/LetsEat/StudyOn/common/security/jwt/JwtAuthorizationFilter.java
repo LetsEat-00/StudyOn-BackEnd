@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,16 +31,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
 
-    private final AntPathRequestMatcher loginRequestMatcher =
-            new AntPathRequestMatcher("/api/v1/auth/login", "POST");
-    private final AntPathRequestMatcher reissueRequestMatcher =
-            new AntPathRequestMatcher("/api/v1/auth/reissue", "POST");
+    // 허용할 요청 (인가 필터를 건너뜀)
+    private final RequestMatcher permitRequestMatcher = new OrRequestMatcher(
+            new AntPathRequestMatcher("/api/v1/auth/login", "POST"),
+            new AntPathRequestMatcher("/api/v1/auth/signup", "POST"),
+            new AntPathRequestMatcher("/api/v1/auth/reissue", "POST")
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // 요청이 로그인인 경우 인증 필터로 넘김
-        if (loginRequestMatcher.matches(request) || reissueRequestMatcher.matches(request)) {
+        // 허용된 요철일 경우 인증 필터로 넘김
+        if (permitRequestMatcher.matches(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -53,7 +57,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 // accessToken 이 유효할 때
                 authenticateWithAccessToken(accessToken);
             }
-        }else {
+        }
+        else {
+            log.info("token is null");
             throw new CustomException(ErrorType.NOT_FOUND_TOKEN);
         }
 
