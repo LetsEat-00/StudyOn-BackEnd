@@ -32,6 +32,7 @@ public class JwtLogoutHandler implements LogoutHandler {
         // accessToken, refreshToken 값이 없는데 로그아웃을 시도할 경우
         if (accessTokenValue == null && refreshTokenValue == null) {
             log.error("로그아웃 시도 중 에러 발생");
+            request.setAttribute("exception", new CustomException(ErrorType.NOT_FOUND_TOKEN));
             throw new CustomException(ErrorType.NOT_FOUND_TOKEN);
         }
 
