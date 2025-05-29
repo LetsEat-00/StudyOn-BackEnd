@@ -3,7 +3,7 @@ POST http://localhost:8080/api/v1/email/send
 Content-Type: application/json
 
 {
-  "email":"ydh5017@naver.com"
+  "email":"{{email}}"
 }
 
 ### 이메일 인증
@@ -11,6 +11,6 @@ PATCH http://localhost:8080/api/v1/email/verify
 Content-Type: application/json
 
 {
-  "email":"ydh5017@naver.com",
+  "email":"{{email}}",
   "code":"LmI07kIC"
 }
