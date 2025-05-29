@@ -3,9 +3,9 @@ package com.LetsEat.StudyOn.domain.user.service;
 import com.LetsEat.StudyOn.common.exception.CustomException;
 import com.LetsEat.StudyOn.common.exception.ErrorType;
 import com.LetsEat.StudyOn.common.security.jwt.TokenProvider;
-import com.LetsEat.StudyOn.domain.user.dto.SignupRequestDto;
-import com.LetsEat.StudyOn.domain.user.dto.TokenRequestDto;
-import com.LetsEat.StudyOn.domain.user.dto.TokenResponseDto;
+import com.LetsEat.StudyOn.common.util.RandomUtil;
+import com.LetsEat.StudyOn.domain.email.service.EmailService;
+import com.LetsEat.StudyOn.domain.user.dto.*;
 import com.LetsEat.StudyOn.domain.user.entity.User;
 import com.LetsEat.StudyOn.domain.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -26,6 +26,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
+    private final EmailService emailService;
 
     /**
      * 회원가입
@@ -90,4 +91,48 @@ public class UserService {
         return tokenResponseDto;
     }
 
+    /**
+     * 사용자 비밀번호 변경
+     * @param passwordDto 현재, 새로운 비밀번호
+     * @param user 사용자 정보
+     */
+    @Transactional
+    public void updatePassword(PasswordUpdateDto passwordDto, User user) {
+        // 기존 패스워드와 일치하는지 확인
+        if(!passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword())){
+            throw new CustomException(ErrorType.INVALID_PASSWORD);
+        }
+
+        // 새로운 패스워드가 기존 패스워드와 같은지 확인
+        if (passwordEncoder.matches(passwordDto.getNewPassword(), user.getPassword())) {
+            throw new CustomException(ErrorType.DUPLICATE_PASSWORD);
+        }
+
+        user.updatePassword(passwordEncoder.encode(passwordDto.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    /**
+     * 비밀번호 찾기 (새비밀번호 메일로 발송)
+     * @param dto 이메일, 이름
+     */
+    @Transactional
+    public void findPassword(PasswordFindDto dto) {
+        User user = userRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorType.NOT_FOUND_USER));
+
+        // 입력한 이름과 동일한지 확인
+        if (!user.checkName(dto.getName())) {
+            throw new CustomException(ErrorType.INVALID_NAME);
+        }
+
+        // 랜덤한 비밀번호 생성
+        String newPassword = RandomUtil.generatePassword();
+
+        // 새비밀번호 메일 발송
+        emailService.sendNewPasswordMail(dto.getEmail(), newPassword);
+
+        user.updatePassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }
