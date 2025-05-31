@@ -36,8 +36,12 @@ public enum ErrorType {
     INVALID_JWT(HttpStatus.UNAUTHORIZED, "유효하지 않는 JWT 입니다."),
     EXPIRED_JWT(HttpStatus.FORBIDDEN, "만료된 JWT 입니다."),
     UNSUPPORTED_JWT(HttpStatus.BAD_REQUEST, "지원되지 않는 JWT입니다."),
-    LOGGED_OUT_TOKEN(HttpStatus.FORBIDDEN, "이미 로그아웃된 토큰입니다.")
+    LOGGED_OUT_TOKEN(HttpStatus.FORBIDDEN, "이미 로그아웃된 토큰입니다."),
 
+    // Follow
+    CANT_FOLLOW_YOURSELF(HttpStatus.UNAUTHORIZED,"자기 자신은 팔로우할 수 없습니다."),
+    ALREADY_FOLLOWED(HttpStatus.UNAUTHORIZED,"이미 팔로우한 사용자 입니다."),
+    ALREADY_UNFOLLOWED(HttpStatus.UNAUTHORIZED,"이미 언팔로우한 사용자 입니다.")
     ;
 
     private final HttpStatus httpStatus;
