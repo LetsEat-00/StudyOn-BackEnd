@@ -98,9 +98,11 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
             .requestMatchers(HttpMethod.POST, "api/v1/auth/signup").permitAll()
+            .requestMatchers(HttpMethod.POST, "api/v1/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "api/v1/auth/reissue").permitAll()
-//            .requestMatchers(HttpMethod.GET, "api/v1/test").permitAll()
-                .requestMatchers(HttpMethod.POST, "api/v1/auth/login").permitAll()
+            .requestMatchers(HttpMethod.POST, "api/v1/email/send").permitAll()
+            .requestMatchers(HttpMethod.PATCH, "api/v1/email/verify").permitAll()
+            .requestMatchers(HttpMethod.PUT, "api/v1/auth/password").permitAll()
             .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 

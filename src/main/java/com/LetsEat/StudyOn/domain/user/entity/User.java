@@ -62,14 +62,17 @@ public class User extends Timestamped {
         return new User(dto, encodedPassword);
     }
 
-    public boolean validateRefreshToken(String refreshToken) {
-        return this.refreshToken != null && this.refreshToken.equals(refreshToken);
-    }
-
     public void checkUserRole() {
         if (!UserRole.ADMIN.equals(this.userRole)) {
             throw new CustomException(ErrorType.NO_AUTHENTICATION);
         }
     }
 
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    public boolean checkName(String name) {
+        return this.name.equals(name);
+    }
 }
