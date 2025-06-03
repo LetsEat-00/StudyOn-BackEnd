@@ -5,6 +5,7 @@ import com.LetsEat.StudyOn.common.enums.UserRole;
 import com.LetsEat.StudyOn.common.exception.CustomException;
 import com.LetsEat.StudyOn.common.exception.ErrorType;
 import com.LetsEat.StudyOn.domain.user.dto.SignupRequestDto;
+import com.LetsEat.StudyOn.domain.user.dto.UserUpdateRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -75,4 +76,12 @@ public class User extends Timestamped {
     public boolean checkName(String name) {
         return this.name.equals(name);
     }
+
+    public void updateProfile(UserUpdateRequestDto dto) {
+        this.name = dto.getName();
+        this.nickname = dto.getNickname();
+        this.profileImage = dto.getProfileImage();
+        this.statusMessage = dto.getStatusMessage();
+    }
+
 }
