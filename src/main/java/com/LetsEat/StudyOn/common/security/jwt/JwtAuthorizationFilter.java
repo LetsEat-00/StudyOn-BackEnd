@@ -38,7 +38,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             new AntPathRequestMatcher("/api/v1/auth/reissue", "POST"),
             new AntPathRequestMatcher("/api/v1/email/send", "POST"),
             new AntPathRequestMatcher("/api/v1/email/verify", "PATCH"),
-            new AntPathRequestMatcher("/api/v1/auth/password", "PUT")
+            new AntPathRequestMatcher("/api/v1/auth/password", "PUT"),
+            new AntPathRequestMatcher("/api/v1/users/profile", "GET")
     );
 
     @Override
