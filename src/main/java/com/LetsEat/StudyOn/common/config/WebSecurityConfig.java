@@ -103,6 +103,8 @@ public class WebSecurityConfig {
             .requestMatchers(HttpMethod.POST, "api/v1/email/send").permitAll()
             .requestMatchers(HttpMethod.PATCH, "api/v1/email/verify").permitAll()
             .requestMatchers(HttpMethod.PUT, "api/v1/auth/password").permitAll()
+            .requestMatchers(HttpMethod.GET, "api/v1/groups/collusion").permitAll()
+            .requestMatchers(HttpMethod.GET, "api/v1/groups/collusion/*").permitAll()
             .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
