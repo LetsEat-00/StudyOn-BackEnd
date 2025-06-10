@@ -28,7 +28,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-
+    
     private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
     private final UserDetailsServiceImpl userDetailsService;
@@ -73,7 +73,6 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        ;
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
@@ -105,6 +104,8 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.PATCH, "api/v1/email/verify").permitAll()
                 .requestMatchers(HttpMethod.PUT, "api/v1/auth/password").permitAll()
                 .requestMatchers(HttpMethod.GET, "api/v1/users/profile").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/groups/collusion").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/groups/collusion/*").permitAll()
                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
