@@ -70,4 +70,38 @@ public class UserController {
         userService.findPassword(passwordFindDto);
         return getResponseEntity("새비밀번호 메일 발송 성공");
     }
+    /**
+     * 내 프로필 정보 조회
+     * @param userDetails 인증된 사용자 정보
+     * @return 내 프로필 정보 DTO와 응답 메시지를 포함한 ResponseEntity
+     */
+    @GetMapping("/users/me")
+    public ResponseEntity<CommonResponse<?>> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return getResponseEntity(UserResponseDto.of(userDetails.getUser()), "내 프로필 조회 성공");
+    }
+    /**
+     * 내 프로필 정보 수정
+     * @param dto 수정할 사용자 정보 (이름, 닉네임, 프로필 이미지 등)
+     * @param userDetails 인증된 사용자 정보
+     * @return 응답 메시지
+     */
+    @PutMapping("/users/me")
+    public ResponseEntity<CommonResponse<?>> updateMyProfile(
+            @Valid @RequestBody UserUpdateRequestDto dto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.updateMyProfile(dto, userDetails.getUser());
+        return getResponseEntity("내 프로필 수정 성공");
+    }
+    /**
+     * 특정 사용자 프로필 상세 조회
+     * @param userId 조회할 사용자 ID
+     * @return 해당 사용자 프로필 정보와 응답 메시지를 포함한 ResponseEntity
+     */
+    @GetMapping("/users/profile/{userId}")
+    public ResponseEntity<CommonResponse<?>> getUserProfile(@PathVariable Long userId) {
+        return getResponseEntity(userService.getUserProfile(userId), "타인 프로필 조회 성공");
+    }
+
+
+
 }
