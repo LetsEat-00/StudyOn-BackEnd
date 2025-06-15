@@ -7,3 +7,29 @@ Authorization: {{Authorization}}
   "groupName": "스터디온 그룹",
   "description": "이 그룹은 스터디를 위해 만들어졌습니다."
 }
+
+### 그룹 목록 조회
+GET http://localhost:8080/api/v1/groups
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 그룹 상세 조회
+GET http://localhost:8080/api/v1/groups/3
+Authorization: {{Authorization}}
+
+### 그룹 수정
+PUT http://localhost:8080/api/v1/groups/3
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "groupName": "스터디온 수정된 그룹",
+  "description": "설명을 바꿔봤습니다."
+}
+### 그룹 탈퇴
+DELETE http://localhost:8080/api/v1/groups/3/leave
+Authorization: {{Authorization}}
+
+### 그룹 삭제
+DELETE http://localhost:8080/api/v1/groups/9
+Authorization: {{Authorization}}
