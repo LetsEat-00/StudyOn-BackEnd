@@ -3,6 +3,7 @@ package com.LetsEat.StudyOn.domain.group.service;
 import com.LetsEat.StudyOn.common.enums.MemberRole;
 import com.LetsEat.StudyOn.common.exception.CustomException;
 import com.LetsEat.StudyOn.common.exception.ErrorType;
+import com.LetsEat.StudyOn.common.util.PageUtil;
 import com.LetsEat.StudyOn.domain.group.dto.GroupRequestDto;
 import com.LetsEat.StudyOn.domain.group.dto.GroupResponseDto;
 import com.LetsEat.StudyOn.domain.group.entity.Group;
@@ -12,11 +13,12 @@ import com.LetsEat.StudyOn.domain.group.repository.MemberRepository;
 import com.LetsEat.StudyOn.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -48,24 +50,14 @@ public class GroupService {
     /**
      * 전체 그룹 목록 조회
      * @return 모든 그룹들의 정보 리스트 (그룹장 ID 포함)
+     * 그룹이름만 빼와도 될듯
      */
-    public List<GroupResponseDto> getAllGroups() {
-        List<Group> groups = groupRepository.findAll();
-        return groups.stream()
-                .map(group -> {
-                    Long ownerId = group.getMemberList().stream()
-                            .filter(member -> member != null
-                                    && member.getMemberRole() == MemberRole.OWNER
-                                    && member.getId() != null
-                                    && member.getId().getUser() != null)
-                            .findFirst()
-                            .map(member -> member.getId().getUser().getId())  // null-safe
-                            .orElse(null);  // 없으면 null
-
-                    return GroupResponseDto.of(group, ownerId);
-                })
-                .collect(Collectors.toList());
+    public Slice<GroupResponseDto> getAllGroups(Pageable pageable) {
+        Slice<Group> groups = groupRepository.findAll(pageable);
+        PageUtil.validateNonEmptySlice(groups); // 페이지 요소 검증
+        return groups.map(GroupResponseDto::of);
     }
+
     /**
      * 특정 그룹 상세 조회
      * @param groupId 조회할 그룹 ID
@@ -122,9 +114,6 @@ public class GroupService {
 
         Member member = memberRepository.findByUserAndGroup(user, group)
                 .orElseThrow(() -> new CustomException(ErrorType.NOT_GROUP_MEMBER));
-        log.info("탈퇴할 멤버 ID: {}", member.getId());
-        log.info("현재 요청 유저 ID: {}", user.getId());
-        log.info("해당 멤버의 역할: {}", member.getMemberRole());
 
         if (member.getMemberRole() == MemberRole.OWNER) {
             throw new CustomException(ErrorType.GROUP_OWNER_CANNOT_LEAVE);

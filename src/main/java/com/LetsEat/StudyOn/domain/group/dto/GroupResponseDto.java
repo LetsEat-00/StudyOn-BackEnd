@@ -17,7 +17,19 @@ public class GroupResponseDto {
         this.description = group.getDescription();
         this.ownerId = id;
     }
+
+    private GroupResponseDto(Long id, String groupName) {
+        this.id = id;
+        this.groupName = groupName;
+        this.description = null;
+        this.ownerId = null;
+    }
+
     public static GroupResponseDto of(Group group, Long id) {
         return new GroupResponseDto(group, id);
+    }
+
+    public static GroupResponseDto of(Group group) {
+        return new GroupResponseDto(group.getId(), group.getGroupName());
     }
 }
