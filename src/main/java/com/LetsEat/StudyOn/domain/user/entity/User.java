@@ -4,7 +4,10 @@ import com.LetsEat.StudyOn.common.entity.Timestamped;
 import com.LetsEat.StudyOn.common.enums.UserRole;
 import com.LetsEat.StudyOn.common.exception.CustomException;
 import com.LetsEat.StudyOn.common.exception.ErrorType;
+import com.LetsEat.StudyOn.domain.group.entity.Applicant;
+import com.LetsEat.StudyOn.domain.group.entity.Member;
 import com.LetsEat.StudyOn.domain.user.dto.SignupRequestDto;
+import com.LetsEat.StudyOn.domain.user.dto.UserUpdateRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,21 +37,27 @@ public class User extends Timestamped {
 
     private String nickname;
 
-    private String profileImage;
+    private String profileImage; // 프로필 이미지
 
-    private String statusMessage;
-
-    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Follow> followingList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Follow> followerList = new ArrayList<>();
+    private String statusMessage; // 상태메시지
 
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private UserRole userRole; // 사용자 권한
 
     @Setter
     private String refreshToken;
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followingList = new ArrayList<>(); // 팔로잉 목록
+
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followerList = new ArrayList<>(); // 팔로워 목록
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Member> memberList = new ArrayList<>(); // 속한 그룹 목록
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Applicant> applicantList = new ArrayList<>(); // 지원한 그룹 공고 목록
 
     private User(SignupRequestDto dto, String encodedPassword) {
         email = dto.getEmail();
@@ -75,4 +84,12 @@ public class User extends Timestamped {
     public boolean checkName(String name) {
         return this.name.equals(name);
     }
+
+    public void updateProfile(UserUpdateRequestDto dto) {
+        this.name = dto.getName();
+        this.nickname = dto.getNickname();
+        this.profileImage = dto.getProfileImage();
+        this.statusMessage = dto.getStatusMessage();
+    }
+
 }

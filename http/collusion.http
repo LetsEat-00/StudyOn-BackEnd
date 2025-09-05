@@ -1,0 +1,68 @@
+## Variables
+@groupId = 1
+@collusionId = 1
+## RECRUITING|CLOSED|EXPIRED|HIDDEN(X)
+@collusionStatus = RECRUITING
+
+@applicantId = 2
+## PENDING(X)|ACCEPTED|REJECTED
+@applicantStatus = ACCEPTED
+
+### 그룹 공고 생성
+POST http://localhost:8080/api/v1/groups/collusion
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "groupId": {{groupId}},
+  "title": "스터디 모집합니다",
+  "content": "자바 스프링부트. 초보자 환영!",
+  "category": "Backend",
+  "tags": "Spring,Java,JPA",
+  "maxMembers": 5,
+  "startAt": "2025-06-10T15:00:00",
+  "endAt": "2025-07-30T18:00:00"
+}
+
+### 그룹 공고 수정
+PUT http://localhost:8080/api/v1/groups/collusion/{{collusionId}}
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "스터디 리더 구합니다",
+  "content": "스터디에서 리더를 맡아줄 분을 구합니다.",
+  "collusionStatus": "RECRUITING",
+  "category": "Backend",
+  "tags": "SpringBoot,JPA,MySQL",
+  "maxMembers": 6,
+  "startAt": "2025-06-15T10:00:00",
+  "endAt": "2025-08-01T18:00:00"
+}
+
+### 그룹 공고 상세조회
+GET http://localhost:8080/api/v1/groups/collusion/{{collusionId}}
+Content-Type: application/json
+
+### 그룹 공고 목록 조회
+GET http://localhost:8080/api/v1/groups/collusion?collusionStatus={{collusionStatus}}&page=0&size=10&sort=createdAt,desc
+Content-Type: application/json
+
+### 그룹 공고 지원
+POST http://localhost:8080/api/v1/groups/collusion/{{collusionId}}/applicants
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "reason": "스터디 주제가 흥미롭고, 함께 성장하고 싶어서 지원합니다."
+}
+
+### 그룹 공고 지원자 목록 조회
+GET http://localhost:8080/api/v1/groups/collusion/{{collusionId}}/applicants?applicantStatus={{applicantStatus}}&page=0&size=10
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 그룹 공고 지원 승인/거절
+PATCH http://localhost:8080/api/v1/groups/collusion/{{collusionId}}/applicants/{{applicantId}}?applicantStatus={{applicantStatus}}
+Content-Type: application/json
+Authorization: {{Authorization}}

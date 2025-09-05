@@ -135,4 +135,25 @@ public class UserService {
         user.updatePassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+    /**
+     * 내 프로필 수정
+     * @param dto 사용자 정보 수정 요청 DTO (이름, 닉네임, 프로필 이미지 등)
+     * @param user 현재 로그인한 사용자
+     */
+    @Transactional
+    public void updateMyProfile(UserUpdateRequestDto dto, User user) {
+        user.updateProfile(dto);
+    }
+    /**
+     * 특정 사용자 프로필 상세 조회
+     * @param userId 조회 대상 사용자 ID
+     * @return 사용자 프로필 정보 DTO (UserResponseDto)
+     */
+    public UserResponseDto getUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorType.NOT_FOUND_USER));
+        return UserResponseDto.of(user);
+    }
+
+
 }

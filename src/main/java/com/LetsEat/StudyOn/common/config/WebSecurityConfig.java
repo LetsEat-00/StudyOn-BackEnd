@@ -72,7 +72,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);;
+        configuration.setAllowCredentials(true);
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
@@ -92,18 +92,21 @@ public class WebSecurityConfig {
 
         // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
         http.sessionManagement((sessionManagement) ->
-            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-            .requestMatchers(HttpMethod.POST, "api/v1/auth/signup").permitAll()
-            .requestMatchers(HttpMethod.POST, "api/v1/auth/login").permitAll()
-            .requestMatchers(HttpMethod.POST, "api/v1/auth/reissue").permitAll()
-            .requestMatchers(HttpMethod.POST, "api/v1/email/send").permitAll()
-            .requestMatchers(HttpMethod.PATCH, "api/v1/email/verify").permitAll()
-            .requestMatchers(HttpMethod.PUT, "api/v1/auth/password").permitAll()
-            .anyRequest().authenticated() // 그 외 모든 요청 인증처리
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
+                .requestMatchers(HttpMethod.POST, "api/v1/auth/signup").permitAll()
+                .requestMatchers(HttpMethod.POST, "api/v1/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "api/v1/auth/reissue").permitAll()
+                .requestMatchers(HttpMethod.POST, "api/v1/email/send").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "api/v1/email/verify").permitAll()
+                .requestMatchers(HttpMethod.PUT, "api/v1/auth/password").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/users/profile").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/groups/collusion").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/groups/collusion/*").permitAll()
+                .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
         // 로그아웃
