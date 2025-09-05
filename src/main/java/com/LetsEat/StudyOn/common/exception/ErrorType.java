@@ -67,7 +67,14 @@ public enum ErrorType {
 
     // Applicant
     NOT_FOUND_APPLICANT(NOT_FOUND, "그룹 공고 지원 현황을 찾을 수 없습니다."),
-    INVALID_APPLICANT_STATUS(BAD_REQUEST, "잘못된 그룹 공고 지원자 상태입니다.")
+    INVALID_APPLICANT_STATUS(BAD_REQUEST, "잘못된 그룹 공고 지원자 상태입니다."),
+
+    // Schedule
+    NOT_FOUND_SCHEDULE(UNAUTHORIZED,"존재하지 않는 공모 입니다."),
+    ALREADY_APPLY(UNAUTHORIZED,"이미 지원한 공모 입니다."),
+    CANT_UPDATE_SCHEDULE(UNAUTHORIZED,"작성자만 공모를 수정할 수 있습니다."),
+    NOT_FOUND_APLLY(UNAUTHORIZED,"지원 내역이 없습니다."),
+    CANT_UPDATE_STATUS(UNAUTHORIZED,"공모 승인 권한이 없습니다.")
 
     ;
 
