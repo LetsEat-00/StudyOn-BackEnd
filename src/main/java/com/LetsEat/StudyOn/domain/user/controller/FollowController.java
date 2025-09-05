@@ -47,7 +47,7 @@ public class FollowController {
     /**
      * 팔로잉 목록 조회
      * @param userId 목록 조회 할 대상
-     * @return 팔로앙 사용자들 목록 및 결과 메시지
+     * @return 팔로잉 사용자들 목록 및 결과 메시지
      */
     @GetMapping("/{userId}/following")
     public ResponseEntity<CommonResponse<?>> getFollowingList(@PathVariable Long userId) {

@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.*;
+import static com.LetsEat.StudyOn.common.config.page.CustomPageableHandlerMethodArgumentResolver.MAX_PAGE_SIZE;
 
 @Getter
 @AllArgsConstructor
@@ -41,7 +42,39 @@ public enum ErrorType {
     // Follow
     CANT_FOLLOW_YOURSELF(HttpStatus.UNAUTHORIZED,"자기 자신은 팔로우할 수 없습니다."),
     ALREADY_FOLLOWED(HttpStatus.UNAUTHORIZED,"이미 팔로우한 사용자 입니다."),
-    ALREADY_UNFOLLOWED(HttpStatus.UNAUTHORIZED,"이미 언팔로우한 사용자 입니다.")
+    ALREADY_UNFOLLOWED(HttpStatus.UNAUTHORIZED,"이미 언팔로우한 사용자 입니다."),
+
+    // Schedule
+    NOT_FOUND_SCHEDULE(HttpStatus.UNAUTHORIZED,"존재하지 않는 공모 입니다."),
+    ALREADY_APPLY(HttpStatus.UNAUTHORIZED,"이미 지원한 공모 입니다."),
+    CANT_UPDATE_SCHEDULE(HttpStatus.UNAUTHORIZED,"작성자만 공모를 수정할 수 있습니다."),
+    NOT_FOUND_APLLY(HttpStatus.UNAUTHORIZED,"지원 내역이 없습니다."),
+    CANT_UPDATE_STATUS(HttpStatus.UNAUTHORIZED,"공모 승인 권한이 없습니다."),
+
+    // group
+    NOT_FOUND_GROUP(NOT_FOUND, "그룹을 찾을 수 없습니다."),
+    ALREADY_GROUP(UNAUTHORIZED,"이미 속한 그룹입니다."),
+
+    // collusion
+    NOT_FOUND_COLLUSION(NOT_FOUND, "그룹 공고를 찾을 수 없습니다."),
+    EXPIRED_COLLUSION(FORBIDDEN, "기한이 종료된 그룹 공고입니다."),
+    CLOSED_COLLUSION(FORBIDDEN, "모집이 종료된 그룹 공고입니다."),
+    INCOMPATIBLE_COLLUSION(FORBIDDEN, "지원할 수 없는 그룹 공고입니다."),
+    ALREADY_APPLIED_COLLUSION(UNAUTHORIZED,"이미 지원한 그룹 공고입니다."),
+
+    // Page
+    INVALID_PAGE_NUMBER_FORMAT(BAD_REQUEST, "숫자 형식이 아닌 페이지 number입니다."),
+    INVALID_PAGE_SIZE_FORMAT(BAD_REQUEST, "숫자 형식이 아닌 페이지 size입니다."),
+    INVALID_PAGE_NUMBER(BAD_REQUEST, "페이지 number는 음수일 수 없습니다."),
+    INVALID_PAGE_SIZE(BAD_REQUEST, "페이지 size는 0 이하일 수 없습니다."),
+    EXCEED_MAX_PAGE_SIZE(BAD_REQUEST, "페이지 size는 " + MAX_PAGE_SIZE + "을 초과할 수 없습니다."),
+    EMPTY_PAGE_ELEMENTS(BAD_REQUEST, "페이지의 요소가 존재하지 않습니다."),
+    PAGE_NOT_FOUND(BAD_REQUEST, "존재하지 않는 페이지입니다."),
+
+    // Applicant
+    NOT_FOUND_APPLICANT(NOT_FOUND, "그룹 공고 지원 현황을 찾을 수 없습니다."),
+    INVALID_APPLICANT_STATUS(BAD_REQUEST, "잘못된 그룹 공고 지원자 상태입니다.")
+
     ;
 
     private final HttpStatus httpStatus;

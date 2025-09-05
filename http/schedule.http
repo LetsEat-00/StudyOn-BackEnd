@@ -1,0 +1,82 @@
+## Variables
+@groupId = 1
+@collusionId = 1
+## RECRUITING|CLOSED|EXPIRED|HIDDEN(X)
+@collusionStatus = RECRUITING
+
+@applicantId = 2
+## PENDING(X)|ACCEPTED|REJECTED
+@applicantStatus = REJECTED
+
+### 일정 생성
+POST http://localhost:8080/api/v1/schedules
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "divisionId": "{{divisionId}}",
+  "title": "{{title}}",
+  "content": "{{content}}",
+  "category": "{{category}}",
+  "tags": "{{tags}}",
+  "studyMethod": "{{studyMethod}}",
+  "location": "{{location}}",
+  "maxMembers": "{{maxMembers}}",
+  "startDt": "{{startDt}}",
+  "endDt": "{{endDt}}"
+}
+
+### 일정 수정
+PUT http://localhost:8080/api/v1/schedules/3
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "divisionId": "{{divisionId}}",
+  "title": "{{title}}",
+  "content": "{{content}}",
+  "category": "{{category}}",
+  "tags": "{{tags}}",
+  "studyMethod": "{{studyMethod}}",
+  "location": "{{location}}",
+  "maxMembers": "{{maxMembers}}",
+  "startDt": "{{startDt}}",
+  "endDt": "{{endDt}}",
+  "scheduleStatus": "closed"
+}
+
+### 일정 지원
+POST http://localhost:8080/api/v1/schedules/applications/5
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "reason": "공부하고 싶어용"
+}
+
+### 일정 지원 수정
+PUT http://localhost:8080/api/v1/schedules/applications/1
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "reason": "사실 별로 안하고 싶음 ㅋ"
+}
+
+### 일정 목록 조회
+GET http://localhost:8080/api/v1/schedules?collusionStatus={{collusionStatus}}&page=0&size=10&sort=createdAt,desc
+Content-Type: application/json
+
+### 일정 목록 상세 조회
+GET http://localhost:8080/api/v1/schedules/5
+Content-Type: application/json
+
+### 일회성 공모 지원 목록 조회
+GET http://localhost:8080/api/v1/schedules/applications/1?collusionStatus={{collusionStatus}}&page=0&size=10&sort=createdAt,desc
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 일회성 공모 지원 승인/거절
+PATCH http://localhost:8080/api/v1/schedules/applications/4?applicantStatus={{applicantStatus}}
+Content-Type: application/json
+Authorization: {{Authorization}}
