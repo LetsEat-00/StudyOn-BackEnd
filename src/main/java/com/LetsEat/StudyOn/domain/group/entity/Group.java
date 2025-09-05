@@ -59,4 +59,10 @@ public class Group extends Timestamped {
     public void addMember(User user) {
         this.memberList.add(Member.of(user, this, MemberRole.MEMBER));
     }
+
+    // 그룹 업데이트
+    public void update(String groupName, String description) {
+        this.groupName = groupName;
+        this.description = description;
+    }
 }

@@ -48,6 +48,9 @@ public enum ErrorType {
     // group
     NOT_FOUND_GROUP(NOT_FOUND, "그룹을 찾을 수 없습니다."),
     ALREADY_GROUP(UNAUTHORIZED,"이미 속한 그룹입니다."),
+    GROUP_OWNER_CANNOT_LEAVE(FORBIDDEN, "그룹장은 탈퇴할 수 없습니다."),
+    NOT_GROUP_MEMBER(NOT_FOUND, "해당 그룹에 속해있지 않습니다."),
+
 
     // collusion
     NOT_FOUND_COLLUSION(NOT_FOUND, "그룹 공고를 찾을 수 없습니다."),
